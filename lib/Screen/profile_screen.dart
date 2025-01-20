@@ -24,7 +24,7 @@ class ProfileScreen extends StatelessWidget {
       );
     }
 
-    // ดึงข้อมูลเพิ่มเติมจาก Firestore
+    // ดึงข้อมูลจาก Firestore
     return FutureBuilder<DocumentSnapshot>(
       future: _firestore.collection('users').doc(user.uid).get(),
       builder: (context, snapshot) {

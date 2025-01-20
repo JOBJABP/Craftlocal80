@@ -129,8 +129,14 @@ class SettingsScreen extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('เปลี่ยนรหัสผ่าน'),
-          content: Column(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          title: Text('เปลี่ยนรหัสผ่าน', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+          content: SingleChildScrollView(
+            child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
                 controller: _currentPasswordController,
@@ -159,6 +165,7 @@ class SettingsScreen extends StatelessWidget {
                 obscureText: true,
               ),
             ],
+            ),
           ),
           actions: [
             TextButton(
