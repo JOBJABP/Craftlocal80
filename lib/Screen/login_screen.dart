@@ -14,15 +14,38 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final formkey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final Future<FirebaseApp> firebase = Firebase.initializeApp();
   Users users = Users();
+
+  // ฟังก์ชันสำหรับการรีเซ็ตรหัสผ่าน
+  Future<void> _resetPassword() async {
+    String email = _emailController.text;
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('กรุณากรอกอีเมลก่อน')),
+      );
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('อีเมลสำหรับรีเซ็ตรหัสผ่านถูกส่งไปยังอีเมลของคุณ')),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('เกิดข้อผิดพลาด: ${e.message}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: firebase, // Future ที่เรียกใช้งาน
+      future: firebase,
       builder: (context, snapshot) {
-        // ตรวจสอบกรณีที่เกิดข้อผิดพลาด
         if (snapshot.hasError) {
           return Scaffold(
             appBar: AppBar(
@@ -48,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             CircleAvatar(
                               radius: 150,
                               backgroundImage:
-                                  AssetImage('assets/images/logo3.jpg'),
+                              AssetImage('assets/images/logo3.jpg'),
                               backgroundColor: Colors.transparent,
                             ),
                             SizedBox(height: 20),
@@ -60,12 +83,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(height: 30),
                             // ช่องกรอกอีเมล
                             TextFormField(
+                              controller: _emailController,
                               validator: MultiValidator([
                                 RequiredValidator(errorText: "กรุณาป้อนอีเมล"),
                                 EmailValidator(
                                     errorText: "รูปแบบของอีเมลไม่ถูกต้อง")
                               ]),
-                              // controller: _emailController,
                               decoration: InputDecoration(
                                 labelText: 'กรุณากรอก Email',
                                 border: OutlineInputBorder(
@@ -77,19 +100,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fillColor: Color(0xFFFDEAB2),
                               ),
                               keyboardType: TextInputType.emailAddress,
-                              onSaved: (String? email) {
-                                if (email != null && email.isNotEmpty) {
-                                  users.email = email;
-                                }
-                              },
                             ),
                             SizedBox(height: 16),
 
                             // ช่องกรอกรหัสผ่าน
                             TextFormField(
+                              controller: _passwordController,
                               validator: RequiredValidator(
                                   errorText: "กรุณาป้อนรหัสผ่าน"),
-                              // controller: _passwordController,
                               decoration: InputDecoration(
                                 labelText: 'กรุณากรอกรหัสผ่าน',
                                 border: OutlineInputBorder(
@@ -101,25 +119,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fillColor: Color(0xFFFDEAB2),
                               ),
                               obscureText: true,
-                              onSaved: (String? password) {
-                                if (password != null && password.isNotEmpty) {
-                                  users.password = password;
-                                }
-                              },
                             ),
                             SizedBox(height: 20),
-                            // ปุ่มสมัคร
+                            // ปุ่มเข้าสู่ระบบ
                             ElevatedButton(
                               onPressed: () async {
                                 if (formkey.currentState!.validate()) {
-                                  formkey.currentState?.save();
-                                  // print("name = ${user.name} email = ${user.email} password = ${user.password} confirm= ${user.confirm} ");
-                                  // formkey.currentState?.reset();
+                                  String email = _emailController.text;
+                                  String password = _passwordController.text;
+
                                   try {
                                     await FirebaseAuth.instance
                                         .signInWithEmailAndPassword(
-                                            email: users.email!,
-                                            password: users.password!)
+                                        email: email, password: password)
                                         .then((value) {
                                       formkey.currentState?.reset();
                                       Navigator.pushReplacement(context,
@@ -166,6 +178,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                     color: Color(0xFF000000), fontSize: 15),
                               ),
                             ),
+                            // ลิงค์สำหรับรีเซ็ตรหัสผ่าน
+                            TextButton(
+                              onPressed: _resetPassword,
+                              child: Text(
+                                'ลืมรหัสผ่าน? คลิกที่นี่',
+                                style: TextStyle(
+                                    color: Color(0xFF000000), fontSize: 15),
+                              ),
+                            ),
                           ],
                         ),
                       )),
@@ -180,120 +201,4 @@ class _LoginScreenState extends State<LoginScreen> {
       },
     );
   }
-  // final _usernameController = TextEditingController();
-  // final _passwordController = TextEditingController();
-  //
-  // void _login() {
-  //   String username = _usernameController.text;
-  //   String password = _passwordController.text;
-  //
-  //   if (username.isNotEmpty && password.isNotEmpty) {
-  //     Navigator.pushReplacementNamed(context, '/home');
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('กรุณากรอกชื่อผู้ใช้และรหัสผ่าน')),
-  //     );
-  //   }
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   _usernameController.dispose();
-  //   _passwordController.dispose();
-  //   super.dispose();
-  // }
-  //
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     resizeToAvoidBottomInset: true,
-  //     backgroundColor: Color(0xFFFFC107),
-  //     body: Center(
-  //       child: SingleChildScrollView(
-  //         padding: const EdgeInsets.all(50.0),
-  //         child: Column(
-  //           mainAxisAlignment: MainAxisAlignment.center,
-  //           children: [
-  //             // โลโก้
-  //             CircleAvatar(
-  //               radius: 150,
-  //               backgroundImage: AssetImage('assets/images/logo3.jpg'),
-  //               backgroundColor: Colors.transparent,
-  //             ),
-  //             SizedBox(height: 20),
-  //             Text(
-  //               "ลงชื่อเข้าใช้",
-  //               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-  //             ),
-  //             SizedBox(height: 30),
-  //
-  //             // ช่องกรอกชื่อผู้ใช้
-  //             TextField(
-  //               controller: _usernameController,
-  //               decoration: InputDecoration(
-  //                 labelText: 'ชื่อผู้ใช้',
-  //                 border: OutlineInputBorder(
-  //                   borderSide: BorderSide.none,
-  //                   borderRadius: BorderRadius.circular(20),
-  //                 ),
-  //                 prefixIcon: Icon(Icons.person),
-  //                 filled: true,
-  //                 fillColor: Color(0xFFFDEAB2),
-  //               ),
-  //             ),
-  //             SizedBox(height: 20),
-  //             // ช่องกรอกรหัสผ่าน
-  //             TextField(
-  //               controller: _passwordController,
-  //               decoration: InputDecoration(
-  //                 labelText: 'รหัสผ่าน',
-  //                 border: OutlineInputBorder(
-  //                   borderSide: BorderSide.none,
-  //                   borderRadius: BorderRadius.circular(20),
-  //                 ),
-  //                 prefixIcon: Icon(Icons.lock),
-  //                 filled: true,
-  //                 fillColor: Color(0xFFFDEAB2),
-  //               ),
-  //               obscureText: true,
-  //             ),
-  //             SizedBox(height: 20),
-  //             // ปุ่มล็อกอิน
-  //             ElevatedButton(
-  //               onPressed: _login,
-  //               style: ElevatedButton.styleFrom(
-  //                 backgroundColor: Colors.black,
-  //                 padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-  //                 shape: RoundedRectangleBorder(
-  //                   borderRadius: BorderRadius.circular(30),
-  //                 ),
-  //               ),
-  //               child: Text(
-  //                 'ลงชื่อ',
-  //                 style: TextStyle(
-  //                     color: Color(0xFFFDBF07),
-  //                     fontSize: 18,
-  //                     fontWeight: FontWeight.bold),
-  //               ),
-  //             ),
-  //             SizedBox(height: 5),
-  //
-  //             // ลิงค์ไปหน้าสมัครสมาชิก
-  //             TextButton(
-  //               onPressed: () {
-  //                 Navigator.pushNamed(context, '/signup');
-  //               },
-  //               child: Text(
-  //                 'ไม่มีบัญชี? กดที่นี่',
-  //                 style: TextStyle(
-  //                   color: Colors.black,
-  //                 ),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 }
