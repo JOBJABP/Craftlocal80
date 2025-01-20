@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:looting/Screen/home_screen.dart';
+import 'package:looting/Screen/signup_screen.dart';
 
 import '../model/user.dart';
 
@@ -154,8 +155,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             // ลิงค์สำหรับหน้าล็อกอิน
                             TextButton(
                               onPressed: () {
-                                Navigator.pushReplacementNamed(
-                                    context, '/signup');
+                                Navigator.pushReplacement(context,
+                                    MaterialPageRoute(builder: (context) {
+                                      return SignUpScreen();
+                                    }));
                               },
                               child: Text(
                                 'ยังไม่มีบัญชี กดที่นี่',
