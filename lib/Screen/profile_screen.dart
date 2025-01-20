@@ -77,7 +77,7 @@ class ProfileScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '$fname ',  // แสดงชื่อผู้ใช้งาน
+                          '$fname',  // แสดงชื่อผู้ใช้งาน
                           style: TextStyle(
                             fontSize: 40.0,
                             fontWeight: FontWeight.w300,

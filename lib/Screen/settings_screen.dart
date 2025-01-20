@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatelessWidget {
   User? user = FirebaseAuth.instance.currentUser;
-  bool isDarkModeEnabled = false;
-  // สถานะ Dark Mode
+
+  // ฟังก์ชันแสดง Dialog เปลี่ยนชื่อ
   void _showChangeNameDialog(BuildContext context) {
     final TextEditingController _nameController = TextEditingController();
 
@@ -29,12 +29,179 @@ class SettingsScreen extends StatelessWidget {
               child: Text('ยกเลิก'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 String newName = _nameController.text.trim();
                 if (newName.isNotEmpty) {
-                  // TODO: อัปเดตชื่อในฐานข้อมูล
+                  try {
+                    // อัปเดตชื่อใน Firestore
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user!.uid)
+                        .update({'fname': newName});
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('เปลี่ยนชื่อสำเร็จ!')),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('เกิดข้อผิดพลาดในการเปลี่ยนชื่อ')),
+                    );
+                  }
+                } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('เปลี่ยนชื่อสำเร็จ!')),
+                    SnackBar(content: Text('กรุณากรอกชื่อใหม่')),
+                  );
+                }
+                Navigator.pop(context);
+              },
+              child: Text('บันทึก'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ฟังก์ชันแสดง Dialog เปลี่ยนอีเมล
+  void _showChangeEmailDialog(BuildContext context) {
+    final TextEditingController _emailController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('เปลี่ยนอีเมล'),
+          content: TextField(
+            controller: _emailController,
+            decoration: InputDecoration(
+              labelText: 'อีเมลใหม่',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // ปิด Dialog
+              },
+              child: Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                String newEmail = _emailController.text.trim();
+                if (newEmail.isNotEmpty) {
+                  try {
+                    await user!.updateEmail(newEmail); // เปลี่ยนอีเมลใน FirebaseAuth
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user!.uid)
+                        .update({'email': newEmail}); // อัปเดตอีเมลใน Firestore
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('เปลี่ยนอีเมลสำเร็จ!')),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('เกิดข้อผิดพลาดในการเปลี่ยนอีเมล')),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('กรุณากรอกอีเมลใหม่')),
+                  );
+                }
+                Navigator.pop(context);
+              },
+              child: Text('บันทึก'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ฟังก์ชันแสดง Dialog เปลี่ยนรหัสผ่าน
+  void _showChangePasswordDialog(BuildContext context) {
+    final TextEditingController _currentPasswordController = TextEditingController();
+    final TextEditingController _newPasswordController = TextEditingController();
+    final TextEditingController _confirmPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('เปลี่ยนรหัสผ่าน'),
+          content: Column(
+            children: [
+              TextField(
+                controller: _currentPasswordController,
+                decoration: InputDecoration(
+                  labelText: 'รหัสผ่านปัจจุบัน',
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: _newPasswordController,
+                decoration: InputDecoration(
+                  labelText: 'รหัสผ่านใหม่',
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: _confirmPasswordController,
+                decoration: InputDecoration(
+                  labelText: 'ยืนยันรหัสผ่านใหม่',
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // ปิด Dialog
+              },
+              child: Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                String currentPassword = _currentPasswordController.text.trim();
+                String newPassword = _newPasswordController.text.trim();
+                String confirmPassword = _confirmPasswordController.text.trim();
+
+                if (newPassword.isNotEmpty && confirmPassword.isNotEmpty) {
+                  if (newPassword == confirmPassword) {
+                    try {
+                      // ตรวจสอบรหัสผ่านปัจจุบัน (ต้องใช้ฟังก์ชัน reauthenticate)
+                      final credential = EmailAuthProvider.credential(
+                        email: user!.email!,
+                        password: currentPassword,
+                      );
+                      await user!.reauthenticateWithCredential(credential);
+
+                      // เปลี่ยนรหัสผ่าน
+                      await user!.updatePassword(newPassword);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('เปลี่ยนรหัสผ่านสำเร็จ!')),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน')),
+                      );
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('รหัสผ่านใหม่ไม่ตรงกัน')),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('กรุณากรอกรหัสผ่านใหม่')),
                   );
                 }
                 Navigator.pop(context);
@@ -73,7 +240,8 @@ class SettingsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'รายละเอียดผู้ใช้งาน : ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        'รายละเอียดผู้ใช้งาน : ',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       user != null
                           ? StreamBuilder<DocumentSnapshot>(
@@ -89,7 +257,7 @@ class SettingsScreen extends StatelessWidget {
                           } else if (snapshot.hasData && snapshot.data!.exists) {
                             var userData = snapshot.data!.data() as Map<String, dynamic>;
                             return Text(
-                              'ชื่อ: ${userData['fname']} ${userData['lname']}',
+                              'ชื่อ: ${userData['fname']} ',
                               style: TextStyle(fontSize: 15),
                             );
                           } else {
@@ -99,7 +267,10 @@ class SettingsScreen extends StatelessWidget {
                       )
                           : Text("ยังไม่มีผู้ใช้ล็อกอิน"),
                       user != null
-                          ? Text('Email: ${user!.email}',style: TextStyle(fontSize: 15),) // แสดงอีเมลผู้ใช้
+                          ? Text(
+                        'อีเมล: ${user!.email}',
+                        style: TextStyle(fontSize: 15),
+                      ) // แสดงอีเมลผู้ใช้
                           : Text("ยังไม่มีผู้ใช้ล็อกอิน"), // กรณีไม่มีผู้ใช้
                     ],
                   ),
@@ -118,12 +289,14 @@ class SettingsScreen extends StatelessWidget {
               leading: Icon(Icons.email),
               title: Text('เปลี่ยนอีเมล'),
               onTap: () {
+                _showChangeEmailDialog(context); // แสดง Dialog เปลี่ยนอีเมล
               },
             ),
             ListTile(
               leading: Icon(Icons.lock),
               title: Text('เปลี่ยนรหัสผ่าน'),
               onTap: () {
+                _showChangePasswordDialog(context); // แสดง Dialog เปลี่ยนรหัสผ่าน
               },
             ),
             ListTile(
