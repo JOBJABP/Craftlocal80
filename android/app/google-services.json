@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "198918804590",
+    "project_id": "craftlocal-8490f",
+    "storage_bucket": "craftlocal-8490f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:198918804590:android:f2a44aca8bc8515995427f",
+        "android_client_info": {
+          "package_name": "com.example.looting"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMy2R1fejx2HwVJgE1dhIeizhJp_lIHfk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

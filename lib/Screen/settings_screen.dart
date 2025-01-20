@@ -1,13 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class SettingsScreen extends StatefulWidget {
-  @override
-  _SettingsScreenState createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool isDarkModeEnabled = false; // สถานะ Dark Mode
-
+class SettingsScreen extends StatelessWidget {
+  User? user = FirebaseAuth.instance.currentUser;
+  bool isDarkModeEnabled = false;
+  // สถานะ Dark Mode
   void _showChangeNameDialog(BuildContext context) {
     final TextEditingController _nameController = TextEditingController();
 
@@ -63,6 +61,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // ส่วนหัวโปรไฟล์
             Container(
               padding: EdgeInsets.symmetric(vertical: 20),
+              margin: EdgeInsets.all(2),
               child: Row(
                 children: [
                   CircleAvatar(
@@ -74,10 +73,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'ชื่อผู้ใช้: นาย สมพงศ์ กองครกอบ',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        'รายละเอียดผู้ใช้งาน : ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      Text('อีเมล: Sompong123@gmail.com'),
+                      user != null
+                          ? StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user!.uid)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Text("กำลังโหลด...");
+                          } else if (snapshot.hasError) {
+                            return Text("เกิดข้อผิดพลาด");
+                          } else if (snapshot.hasData && snapshot.data!.exists) {
+                            var userData = snapshot.data!.data() as Map<String, dynamic>;
+                            return Text(
+                              'ชื่อ: ${userData['fname']} ${userData['lname']}',
+                              style: TextStyle(fontSize: 15),
+                            );
+                          } else {
+                            return Text("ไม่มีข้อมูลผู้ใช้");
+                          }
+                        },
+                      )
+                          : Text("ยังไม่มีผู้ใช้ล็อกอิน"),
+                      user != null
+                          ? Text('Email: ${user!.email}',style: TextStyle(fontSize: 15),) // แสดงอีเมลผู้ใช้
+                          : Text("ยังไม่มีผู้ใช้ล็อกอิน"), // กรณีไม่มีผู้ใช้
                     ],
                   ),
                 ],

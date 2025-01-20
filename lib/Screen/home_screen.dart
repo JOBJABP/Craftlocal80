@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:looting/Screen/WorkerDetailScreen.dart';
-import '';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -329,7 +328,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
           switch (index) {
             case 0:
-              Navigator.pushNamed(context, '/home');
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) {
+                    return HomeScreen();
+                  }));
+              // Navigator.pushNamed(context, '/home');
               break;
             case 1:
               Navigator.pushNamed(context, '/settings');
