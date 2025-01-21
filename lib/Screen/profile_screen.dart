@@ -77,22 +77,22 @@ class ProfileScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '$fname',  // แสดงชื่อผู้ใช้งาน
+                          'ชื่อผู้ใช้ : ${userData['fname']}',  // แสดงชื่อผู้ใช้งาน
                           style: TextStyle(
-                            fontSize: 40.0,
+                            fontSize: 30.0,
                             fontWeight: FontWeight.w300,
                             color: Colors.black,
                           ),
                         ),
                         SizedBox(height: 8.0),
-                        // Text(
-                        //   job,  // แสดงอาชีพ
-                        //   style: TextStyle(
-                        //     fontSize: 18.0,
-                        //     fontWeight: FontWeight.w300,
-                        //     color: Colors.black,
-                        //   ),
-                        // ),
+                        Text(
+                          'Email : ${user.email}',  // แสดงชื่อผู้ใช้งาน
+                          style: TextStyle(
+                            fontSize: 25.0,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.black,
+                          ),
+                        ),
                       ],
                     ),
                   ),
