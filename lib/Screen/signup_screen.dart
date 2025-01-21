@@ -16,6 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _phoneController = TextEditingController(); // เพิ่มตัวควบคุมเบอร์โทร
 
   final Future<FirebaseApp> firebase = Firebase.initializeApp();
   Users users = Users();
@@ -27,6 +28,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       String fname = _nameController.text;
       String email = _emailController.text;
       String password = _passwordController.text;
+      String phone = _phoneController.text; // ดึงเบอร์โทรจาก controller
 
       try {
         // สร้างผู้ใช้ใน Firebase Authentication
@@ -40,8 +42,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           "uid": userCredential.user!.uid,
           "fname": fname,
           "email": email,
-          // "phone": "เบอร์โทรศัพท์",
-          // "address": "ที่อยู่",
+          "phone": phone, // เก็บเบอร์โทรใน Firestore
+          // "address": "ที่อยู่",  // เพิ่มข้อมูลอื่น ๆ ตามที่ต้องการ
           // "createdAt": FieldValue.serverTimestamp(),
         });
 
@@ -142,6 +144,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           obscureText: true,
                         ),
                         SizedBox(height: 16),
+                        TextFormField(
+                          controller: _phoneController, // เพิ่มช่องกรอกเบอร์โทร
+                          validator: RequiredValidator(errorText: "กรุณากรอกเบอร์โทรศัพท์"),
+                          decoration: InputDecoration(
+                            labelText: 'กรุณากรอกเบอร์โทรศัพท์',
+                            border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(20)),
+                            prefixIcon: Icon(Icons.phone),
+                            filled: true,
+                            fillColor: Color(0xFFFDEAB2),
+                          ),
+                          keyboardType: TextInputType.phone,
+                        ),
+                        SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: _signUp,
                           style: ElevatedButton.styleFrom(
@@ -173,3 +188,4 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
+

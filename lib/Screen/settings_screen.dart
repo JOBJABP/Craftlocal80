@@ -61,64 +61,6 @@ class SettingsScreen extends StatelessWidget {
       },
     );
   }
-
-  // ฟังก์ชันแสดง Dialog เปลี่ยนอีเมล
-  void _showChangeEmailDialog(BuildContext context) {
-    final TextEditingController _emailController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('เปลี่ยนอีเมล'),
-          content: TextField(
-            controller: _emailController,
-            decoration: InputDecoration(
-              labelText: 'อีเมลใหม่',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // ปิด Dialog
-              },
-              child: Text('ยกเลิก'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                String newEmail = _emailController.text.trim();
-                if (newEmail.isNotEmpty) {
-                  try {
-                    await user!.updateEmail(newEmail); // เปลี่ยนอีเมลใน FirebaseAuth
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(user!.uid)
-                        .update({'email': newEmail}); // อัปเดตอีเมลใน Firestore
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('เปลี่ยนอีเมลสำเร็จ!')),
-                    );
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('เกิดข้อผิดพลาดในการเปลี่ยนอีเมล')),
-                    );
-                  }
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('กรุณากรอกอีเมลใหม่')),
-                  );
-                }
-                Navigator.pop(context);
-              },
-              child: Text('บันทึก'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   // ฟังก์ชันแสดง Dialog เปลี่ยนรหัสผ่าน
   void _showChangePasswordDialog(BuildContext context) {
     final TextEditingController _currentPasswordController = TextEditingController();
@@ -247,7 +189,7 @@ class SettingsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'รายละเอียดผู้ใช้งาน : ',
+                        'รายละเอียดผู้ใช้งาน',
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       user != null
@@ -263,9 +205,18 @@ class SettingsScreen extends StatelessWidget {
                             return Text("เกิดข้อผิดพลาด");
                           } else if (snapshot.hasData && snapshot.data!.exists) {
                             var userData = snapshot.data!.data() as Map<String, dynamic>;
-                            return Text(
-                              'ชื่อ: ${userData['fname']} ',
-                              style: TextStyle(fontSize: 15),
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('ชื่อ: ${userData['fname']}',
+                                    style: TextStyle(fontSize: 15)),
+                                Text('อีเมล: ${user!.email}',
+                                    style: TextStyle(fontSize: 15)),
+                                userData['phone'] != null
+                                    ? Text('เบอร์โทร: ${userData['phone']}',
+                                    style: TextStyle(fontSize: 15))
+                                    : SizedBox(), // แสดงเบอร์โทรหากมีข้อมูล
+                              ],
                             );
                           } else {
                             return Text("ไม่มีข้อมูลผู้ใช้");
@@ -273,12 +224,6 @@ class SettingsScreen extends StatelessWidget {
                         },
                       )
                           : Text("ยังไม่มีผู้ใช้ล็อกอิน"),
-                      user != null
-                          ? Text(
-                        'อีเมล: ${user!.email}',
-                        style: TextStyle(fontSize: 15),
-                      ) // แสดงอีเมลผู้ใช้
-                          : Text("ยังไม่มีผู้ใช้ล็อกอิน"), // กรณีไม่มีผู้ใช้
                     ],
                   ),
                 ],
@@ -290,13 +235,6 @@ class SettingsScreen extends StatelessWidget {
               title: Text('เปลี่ยนชื่อ'),
               onTap: () {
                 _showChangeNameDialog(context); // แสดง Dialog เปลี่ยนชื่อ
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.email),
-              title: Text('เปลี่ยนอีเมล'),
-              onTap: () {
-                _showChangeEmailDialog(context); // แสดง Dialog เปลี่ยนอีเมล
               },
             ),
             ListTile(
