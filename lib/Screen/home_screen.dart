@@ -52,15 +52,87 @@ class _HomeScreenState extends State<HomeScreen> {
       "phone": "085-XXX-XXXX",
       "type": "ช่างอิเล็กทรอนิกส์",
       "location": "เชียงใหม่",
-      "profileImageUrl": 'assets/images/logo.png',
+      "profileImageUrl": 'assets/images/profile02.png',
       "reviews": [
         {'name': 'ลูกค้า 3', 'comment': 'ทำงานไม่ครบ', 'rating': 1},
         {'name': 'ลูกค้า 4', 'comment': 'บริการช้า', 'rating': 1},
       ]
     },
+    {
+      "name": "ช่างเอก",
+      "rating": "",
+      "phone": "080-XXX-XXXX",
+      "type": "ช่างไฟฟ้า",
+      "location": "เชียงราย อ.เมือง",
+      "profileImageUrl": "assets/images/profile02.png",
+      "reviews": [
+        {"name": "ลูกค้า 3", "comment": "ซ่อมเร็วมาก", "rating": 4},
+        {"name": "ลูกค้า 4", "comment": "ราคาคุ้มค่า", "rating": 5}
+      ]
+    },
+    {
+      "name": "ช่างจ้อย",
+      "rating": "",
+      "phone": "084-XXX-XXXX",
+      "type": "ช่างประปา",
+      "location": "เชียงราย อ.แม่สาย",
+      "profileImageUrl": "assets/images/profile02.png",
+      "reviews": [
+        {"name": "ลูกค้า 5", "comment": "งานคุณภาพ", "rating": 4},
+        {"name": "ลูกค้า 6", "comment": "มาตรงเวลา", "rating": 5}
+      ]
+    },
+    {
+      "name": "ช่างเพชร",
+      "rating": "",
+      "phone": "082-XXX-XXXX",
+      "type": "ช่างก่อสร้าง",
+      "location": "แพร่ อ.ร้องกวาง",
+      "profileImageUrl": "assets/images/satoshi.jpg",
+      "reviews": [
+        {"name": "ลูกค้า 7", "comment": "ทำงานดี", "rating": 4},
+        {"name": "ลูกค้า 8", "comment": "มืออาชีพ", "rating": 5}
+      ]
+    },
+    {
+      "name": "ช่างไก่",
+      "rating": "",
+      "phone": "089-XXX-XXXX",
+      "type": "ช่างแอร์",
+      "location": "แพร่ อ.สูงเม่น",
+      "profileImageUrl": "assets/images/satoshi.jpg",
+      "reviews": [
+        {"name": "ลูกค้า 9", "comment": "งานเสร็จเร็ว", "rating": 4},
+        {"name": "ลูกค้า 10", "comment": "ราคาย่อมเยา", "rating": 3}
+      ]
+    },
+    {
+      "name": "ช่างทอม",
+      "rating": "",
+      "phone": "087-XXX-XXXX",
+      "type": "ช่างไม้",
+      "location": "น่าน อ.เวียงสา",
+      "profileImageUrl": "assets/images/satoshi.jpg",
+      "reviews": [
+        {"name": "ลูกค้า 11", "comment": "ออกแบบดีมาก", "rating": 5},
+        {"name": "ลูกค้า 12", "comment": "เป็นกันเอง", "rating": 5}
+      ]
+    },
+    {
+      "name": "ช่างต้น",
+      "rating": "",
+      "phone": "085-XXX-XXXX",
+      "type": "ช่างเหล็ก",
+      "location": "น่าน อ.ปัว",
+      "profileImageUrl": "assets/images/satoshi.jpg",
+      "reviews": [
+        {"name": "ลูกค้า 13", "comment": "งานละเอียด", "rating": 5},
+        {"name": "ลูกค้า 14", "comment": "ราคาคุ้มค่า", "rating": 4}
+      ]
+    }
   ];
 
-  final List<String> filters = ["ช่างไฟ", "ช่างประปา", "ช่างแอร์", "ช่างอิเล็กทรอนิกส์"];
+  final List<String> filters = ["ช่างไฟ", "ช่างประปา", "ช่างแอร์", "ช่างอิเล็กทรอนิกส์","ช่างเหล็ก","ช่างไม้","ช่างก่อสร้าง"];
   String? selectedFilter;
 
   @override
@@ -159,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (_searchController.text.isEmpty) {
                     return true;
                   }
-                  return worker['name'].toLowerCase().contains(_searchController.text.toLowerCase()) ||
+                  return worker['location'].toLowerCase().contains(_searchController.text.toLowerCase()) ||
                       worker['type'].toLowerCase().contains(_searchController.text.toLowerCase());
                 }).toList().length,
                 itemBuilder: (context, index) {
@@ -170,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (_searchController.text.isEmpty) {
                       return true;
                     }
-                    return worker['name'].toLowerCase().contains(_searchController.text.toLowerCase()) ||
+                    return worker['location'].toLowerCase().contains(_searchController.text.toLowerCase()) ||
                         worker['type'].toLowerCase().contains(_searchController.text.toLowerCase());
                   }).toList();
 
